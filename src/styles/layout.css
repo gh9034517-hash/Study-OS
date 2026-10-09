@@ -4,7 +4,7 @@
   top: 0;
   z-index: 40;
   padding: 14px var(--page-x);
-  background: linear-gradient(var(--navy-950) 40%, rgba(4, 9, 32, 0));
+  background: linear-gradient(var(--navy-950) 40%, rgb(var(--bg-rgb) / 0));
 }
 .topbar-inner {
   max-width: var(--max);
@@ -35,7 +35,7 @@
   box-shadow: var(--glow);
 }
 .brand b {
-  color: var(--electric-soft);
+  color: var(--accent-text);
   font-weight: 700;
 }
 
@@ -45,7 +45,7 @@
   gap: 4px;
   padding: 5px;
   border-radius: var(--r-pill);
-  background: rgba(238, 243, 255, 0.07);
+  background: rgb(var(--tint-rgb) / 0.07);
   border: 1px solid var(--line);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
@@ -62,7 +62,7 @@
 }
 .pillnav a:hover {
   color: var(--text);
-  background: rgba(238, 243, 255, 0.08);
+  background: rgb(var(--tint-rgb) / 0.08);
 }
 .pillnav a[aria-current='page'] {
   background: var(--ice);
@@ -87,7 +87,7 @@
   transition: background 0.2s, border-color 0.2s;
 }
 .icon-btn:hover {
-  background: rgba(238, 243, 255, 0.08);
+  background: rgb(var(--tint-rgb) / 0.08);
 }
 .icon-btn[aria-current='page'] {
   background: var(--ice);
@@ -151,7 +151,7 @@
     bottom: max(10px, env(safe-area-inset-bottom));
     padding: 6px;
     border-radius: 22px;
-    background: rgba(7, 16, 48, 0.88);
+    background: rgb(var(--surface-rgb) / 0.88);
     border: 1px solid var(--line-strong);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
@@ -170,7 +170,7 @@
   }
   .bottomnav a[aria-current='page'] {
     background: var(--electric);
-    color: #fff;
+    color: var(--on-accent);
   }
   main {
     padding-bottom: 96px;
@@ -213,7 +213,7 @@ main {
   font-size: clamp(5rem, 17vw, 15rem);
   line-height: 1;
   color: transparent;
-  -webkit-text-stroke: 1px rgba(156, 195, 255, 0.12);
+  -webkit-text-stroke: 1px rgb(var(--tint-rgb) / 0.12);
   pointer-events: none;
   user-select: none;
   white-space: nowrap;
@@ -236,7 +236,7 @@ main {
   padding: 0 10px;
   border-radius: 0 var(--r-pill) var(--r-pill) 0;
   background: var(--electric);
-  color: #fff;
+  color: var(--on-accent);
   font-family: var(--font-display);
   letter-spacing: 0.04em;
 }
@@ -249,7 +249,7 @@ main {
 }
 .page-title em {
   font-style: normal;
-  color: var(--electric-soft);
+  color: var(--accent-text);
 }
 .page-lead {
   margin-top: 16px;
@@ -275,7 +275,7 @@ main {
 }
 .section-title em {
   font-style: normal;
-  color: var(--electric-soft);
+  color: var(--accent-text);
 }
 .section-sub {
   color: var(--muted);
@@ -294,7 +294,7 @@ main {
   height: 34px;
   border-radius: 0 var(--r-pill) var(--r-pill) 0;
   background: var(--electric);
-  color: #fff;
+  color: var(--on-accent);
   font-family: var(--font-display);
   font-size: 0.8rem;
   font-weight: 700;
@@ -306,10 +306,10 @@ main {
   margin: clamp(10px, 3vw, 30px) -4vw;
   transform: rotate(-3deg);
   background: var(--electric);
-  color: #fff;
+  color: var(--on-accent);
   overflow: hidden;
-  border-block: 1px solid rgba(255, 255, 255, 0.25);
-  box-shadow: 0 20px 50px -20px rgba(47, 107, 255, 0.6);
+  border-block: 1px solid color-mix(in srgb, var(--on-accent) 25%, transparent);
+  box-shadow: 0 20px 50px -20px rgb(var(--accent-rgb) / 0.6);
 }
 .ribbon.alt {
   transform: rotate(2deg);
@@ -369,7 +369,7 @@ main {
   transform: translateY(99%) scaleY(-1);
 }
 .ice-zone .section-title em {
-  color: var(--electric);
+  color: var(--accent-on-light);
 }
 .ice-zone .section-sub {
   color: var(--ink-muted);
@@ -422,7 +422,7 @@ main {
   left: 50%;
   right: auto;
   transform: translateX(-50%);
-  -webkit-text-stroke-color: rgba(156, 195, 255, 0.08);
+  -webkit-text-stroke-color: rgb(var(--tint-rgb) / 0.08);
 }
 @media (max-width: 760px) {
   .footer-grid {

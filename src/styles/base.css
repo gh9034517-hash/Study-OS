@@ -15,7 +15,7 @@ body {
   background: var(--navy-950);
   color: var(--text);
   font-family: var(--font-body);
-  font-size: 16px;
+  font-size: 1rem;
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
@@ -28,10 +28,10 @@ body::before {
   inset: 0;
   z-index: -1;
   background:
-    radial-gradient(1200px 600px at 85% -10%, rgba(47, 107, 255, 0.22), transparent 60%),
-    radial-gradient(900px 500px at -10% 30%, rgba(24, 42, 107, 0.6), transparent 60%),
-    linear-gradient(transparent 0 calc(100% - 1px), rgba(156, 195, 255, 0.045) 0) 0 0 / 100% 64px,
-    linear-gradient(90deg, transparent 0 calc(100% - 1px), rgba(156, 195, 255, 0.045) 0) 0 0 / 64px 100%,
+    radial-gradient(1200px 600px at 85% -10%, rgb(var(--accent-rgb) / 0.22), transparent 60%),
+    radial-gradient(900px 500px at -10% 30%, rgb(var(--accent-rgb) / 0.1), transparent 60%),
+    linear-gradient(transparent 0 calc(100% - 1px), rgb(var(--tint-rgb) / 0.045) 0) 0 0 / 100% 64px,
+    linear-gradient(90deg, transparent 0 calc(100% - 1px), rgb(var(--tint-rgb) / 0.045) 0) 0 0 / 64px 100%,
     var(--navy-950);
 }
 
@@ -73,7 +73,7 @@ button {
 
 ::selection {
   background: var(--electric);
-  color: #fff;
+  color: var(--on-accent);
 }
 
 .sr-only {
@@ -94,7 +94,7 @@ button {
   top: -60px;
   z-index: 100;
   background: var(--electric);
-  color: #fff;
+  color: var(--on-accent);
   padding: 10px 16px;
   border-radius: var(--r-pill);
   font-weight: 700;

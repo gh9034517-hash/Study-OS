@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
-import { recoveredFromBackup, useData, useSaveState } from './lib/store';
+import { recoveredFromBackup, setData, useData, useSaveState } from './lib/store';
 import { href, ROUTES, useRoute, type RouteName } from './lib/router';
 import { Icon, type IconName } from './components/Icon';
 import { AI_STATE_TEXT, useAIStatus } from './components/AIStatus';
@@ -9,6 +9,7 @@ import { Onboarding } from './pages/Onboarding';
 import { LockScreen } from './pages/LockScreen';
 import { fmt } from './lib/date';
 import Dashboard from './pages/Dashboard';
+import { applyAppearance, resolveTheme } from './lib/appearance';
 
 const Tutor = lazy(() => import('./pages/Tutor'));
 const Quiz = lazy(() => import('./pages/Quiz'));
@@ -48,6 +49,8 @@ export default function App() {
     window.scrollTo({ top: 0 });
     document.getElementById('main')?.focus({ preventScroll: true });
   }, [route]);
+
+  useEffect(() => applyAppearance(data.appearance), [data.appearance]);
 
   useEffect(() => {
     if (recoveredFromBackup) toast('Os dados principais estavam corrompidos e foram recuperados da cópia de segurança.', 'error');
@@ -92,12 +95,14 @@ function PageFallback() {
 function TopBar({ route }: { route: RouteName }) {
   const ai = useAIStatus();
   const save = useSaveState();
+  const data = useData();
+  const isLight = resolveTheme(data.appearance.theme) === 'claro';
   return (
     <header className="topbar">
       <div className="topbar-inner">
         <a className="brand" href={href('painel')} aria-label="StudyOS, ir para o painel">
           <span className="brand-mark" aria-hidden="true">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style={{ stroke: 'var(--on-accent)' }} strokeWidth="2.4" strokeLinecap="round">
               <path d="M7 8h10M7 12h10M7 16h6" />
             </svg>
           </span>
@@ -124,7 +129,16 @@ function TopBar({ route }: { route: RouteName }) {
             {save.status === 'saved' && save.at && `Salvo ${fmt.time(save.at)}`}
             {save.status === 'error' && <span className="save-error">Erro ao salvar</span>}
           </span>
-          <a className="icon-btn" href={href('ajustes')} aria-label="Ajustes" aria-current={route === 'ajustes' ? 'page' : undefined}>
+          <button
+            type="button"
+            className="icon-btn"
+            aria-label={isLight ? 'Mudar para tema escuro' : 'Mudar para tema claro'}
+            title={isLight ? 'Tema escuro' : 'Tema claro'}
+            onClick={() => setData((d) => ({ ...d, appearance: { ...d.appearance, theme: isLight ? 'escuro' : 'claro' } }))}
+          >
+            <Icon name={isLight ? 'moon' : 'sun'} />
+          </button>
+          <a className="icon-btn" href={href('ajustes')} aria-label="Ajustes e aparência" title="Ajustes e aparência" aria-current={route === 'ajustes' ? 'page' : undefined}>
             <Icon name="settings" />
           </a>
         </div>

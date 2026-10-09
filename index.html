@@ -10,6 +10,16 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Unbounded:wght@500;700;800&display=swap" rel="stylesheet" />
     <title>StudyOS</title>
+    <script>
+      // Evita o "piscar" do tema escuro para quem escolheu o tema claro.
+      try {
+        var a = (JSON.parse(localStorage.getItem('studyos:data:v1') || '{}').appearance || {}).theme;
+        if (a === 'claro' || (a === 'sistema' && matchMedia('(prefers-color-scheme: light)').matches)) {
+          document.documentElement.dataset.theme = 'claro';
+          document.documentElement.style.background = '#e9eefa';
+        }
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

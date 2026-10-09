@@ -10,6 +10,7 @@ Aplicação web completa (React + Vite + TypeScript) com backend seguro para IA 
 | **Plano de estudos** | CRUD de matérias, tarefas (prazo, prioridade, estimativa), provas e sessões (planejadas/concluídas). Plano do dia recomendado a partir do tempo disponível, provas próximas, acerto, pendências e flashcards vencidos. |
 | **Revisão inteligente** | Flashcards com repetição espaçada (SM-2), registro de acertos/erros, cartões difíceis priorizados, criação manual ou com IA (com revisão antes de salvar). |
 | **Diagnóstico** | Assuntos com baixo desempenho, tendência (últimos 14 dias × antes), acerto por matéria e por semana, recomendações e análise opcional com IA baseada apenas em dados agregados reais. |
+| **Aparência** | Tema escuro, claro ou do sistema; cor de destaque (8 prontas ou qualquer cor livre) com contraste ajustado automaticamente; fonte dos títulos (futurista, geométrica, técnica, clássica); tamanho do texto; cantos; animações; fundo; faixas decorativas. Botão rápido de tema no topo. |
 | **Ajustes** | Perfil, senha local (hash PBKDF2), exportar/importar backup JSON, apagar dados, status e limites da IA. |
 
 Os dados ficam no `localStorage` do navegador com salvamento automático, cópia de segurança interna e sincronização entre abas. Nenhum dado é simulado: gráficos e estatísticas só mostram o que você registrou.

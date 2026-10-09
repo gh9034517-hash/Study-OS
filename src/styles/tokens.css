@@ -1,3 +1,5 @@
+/* Os valores de destaque abaixo são o padrão; src/lib/appearance.ts os recalcula
+   a partir da cor escolhida pelo usuário, garantindo contraste mínimo. */
 :root {
   /* Superfícies — azul-marinho profundo */
   --navy-950: #040920;
@@ -5,12 +7,19 @@
   --navy-850: #0a1640;
   --navy-800: #0f1e52;
   --navy-700: #182a6b;
+  --bg-rgb: 4 9 32;
+  --surface-rgb: 15 30 82;
+  --tint-rgb: 156 195 255; /* linhas e véus sobre o fundo */
 
-  /* Azul elétrico — a cor de ação */
+  /* Destaque (cor de ação) */
   --electric: #2f6bff;
   --electric-strong: #1f55e6;
   --electric-soft: #5d8dff;
   --sky: #9cc3ff;
+  --accent-text: #6f99ff;
+  --accent-on-light: #2f6bff;
+  --on-accent: #ffffff;
+  --accent-rgb: 47 107 255;
 
   /* Tons claros */
   --ice: #eef3ff;
@@ -18,12 +27,12 @@
   --ink: #081233; /* texto sobre gelo */
   --ink-muted: #4a5a86;
 
-  /* Texto sobre marinho */
+  /* Texto */
   --text: #eaf0ff;
   --text-2: #b9c7ea;
   --muted: #8797c2;
-  --line: rgba(156, 195, 255, 0.14);
-  --line-strong: rgba(156, 195, 255, 0.28);
+  --line: rgb(var(--tint-rgb) / 0.14);
+  --line-strong: rgb(var(--tint-rgb) / 0.28);
 
   /* Status (reservados: sempre com ícone + rótulo) */
   --good: #34d399;
@@ -39,11 +48,77 @@
   --r-pill: 999px;
 
   --shadow-lift: 0 18px 40px -18px rgba(0, 8, 40, 0.75);
-  --glow: 0 0 0 1px rgba(93, 141, 255, 0.35), 0 10px 30px -10px rgba(47, 107, 255, 0.55);
+  --glow: 0 0 0 1px rgb(var(--accent-rgb) / 0.35), 0 10px 30px -10px rgb(var(--accent-rgb) / 0.55);
+  --select-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none' stroke='%239cc3ff' stroke-width='2'%3E%3Cpath d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
 
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --page-x: clamp(16px, 4vw, 48px);
   --max: 1240px;
 
   color-scheme: dark;
+}
+
+/* ── Tema claro ────────────────────────────────────────────────────── */
+:root[data-theme='claro'] {
+  --navy-950: #e9eefa;
+  --navy-900: #f4f7fe;
+  --navy-850: #ffffff;
+  --navy-800: #dfe6f7;
+  --navy-700: #1a2b66;
+  --bg-rgb: 233 238 250;
+  --surface-rgb: 255 255 255;
+  --tint-rgb: 8 18 51;
+
+  --ice: #ffffff;
+  --ice-2: #e3eafb;
+  --text: #0a1433;
+  --text-2: #2c3b66;
+  --muted: #55648c;
+  --line: rgb(var(--tint-rgb) / 0.12);
+  --line-strong: rgb(var(--tint-rgb) / 0.22);
+
+  --good: #047857;
+  --warn: #b45309;
+  --bad: #be123c;
+
+  --shadow-lift: 0 18px 40px -18px rgba(8, 18, 51, 0.28);
+  --select-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none' stroke='%2355648c' stroke-width='2'%3E%3Cpath d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+
+  color-scheme: light;
+}
+:root[data-theme='claro'] .panel {
+  background: rgb(255 255 255 / 0.7);
+}
+:root[data-theme='claro'] .btn-ice,
+:root[data-theme='claro'] .panel-ice,
+:root[data-theme='claro'] .flashcard,
+:root[data-theme='claro'] .bubble.assistant,
+:root[data-theme='claro'] .source-card.active {
+  box-shadow: 0 0 0 1px var(--line-strong);
+}
+:root[data-theme='claro'] .chat-log {
+  background: var(--navy-900);
+}
+:root[data-theme='claro'] .modal-backdrop {
+  background: rgba(8, 18, 51, 0.45);
+}
+
+/* ── Fundo liso (sem grade nem brilhos) ───────────────────────────── */
+:root[data-bg='liso'] body::before {
+  background: var(--navy-950);
+}
+
+/* ── Faixas decorativas ocultas ───────────────────────────────────── */
+:root[data-ribbons='off'] .ribbon {
+  display: none;
+}
+
+/* ── Animações reduzidas por escolha do usuário ───────────────────── */
+:root[data-motion='reduzidas'] *,
+:root[data-motion='reduzidas'] *::before,
+:root[data-motion='reduzidas'] *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
 }

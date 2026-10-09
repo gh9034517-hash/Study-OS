@@ -7,6 +7,7 @@ import { PageHero } from '../components/Decor';
 import { Icon } from '../components/Icon';
 import { AI_STATE_TEXT, useAIStatus } from '../components/AIStatus';
 import { useFeedback } from '../components/Feedback';
+import { AppearanceSettings } from './AppearanceSettings';
 
 export default function Settings() {
   return (
@@ -21,9 +22,10 @@ export default function Settings() {
               Do seu <em>jeito.</em>
             </>
           }
-          lead="Perfil, segurança local, backup dos dados e status da IA."
+          lead="Aparência, perfil, segurança local, backup dos dados e status da IA."
         />
         <div className="settings-grid">
+          <AppearanceSettings />
           <ProfileForm />
           <AIInfo />
           <LockSettings />

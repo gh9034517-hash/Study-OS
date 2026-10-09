@@ -95,3 +95,31 @@ test('banco local: questões válidas e embaralhamento preserva a resposta', () 
   }
   assert.equal(pickLocalQuestions('Física', 3).length, 3);
 });
+
+import { accentPalette, contrast, normalizeAppearance, ACCENT_PRESETS, DEFAULT_APPEARANCE } from '../src/lib/appearance.ts';
+
+test('aparência: qualquer cor gera variações com contraste mínimo nos dois temas', () => {
+  const colors = [...ACCENT_PRESETS.map((p) => p.hex), '#ffff00', '#000000', '#ffffff', '#7fffd4', '#123456'];
+  for (const hex of colors) {
+    for (const theme of ['escuro', 'claro'] as const) {
+      const p = accentPalette(hex, theme);
+      const bg = theme === 'escuro' ? '#040920' : '#e9eefa';
+      assert.ok(contrast(p.sky, bg) >= 4.5, `sky ${hex} ${theme}`);
+      assert.ok(contrast(p.text, bg) >= 3, `text ${hex} ${theme}`);
+      assert.ok(contrast(p.onLight, '#ffffff') >= 3, `onLight ${hex}`);
+      // Texto sobre a cor escolhe o lado de maior contraste.
+      assert.ok(contrast(p.onAccent, p.electric) >= Math.min(contrast('#ffffff', p.electric), contrast('#081233', p.electric)));
+    }
+  }
+  assert.equal(accentPalette('#f5a524', 'escuro').onAccent, '#081233');
+  assert.equal(accentPalette('#2f6bff', 'escuro').onAccent, '#ffffff');
+});
+
+test('aparência: valores inválidos voltam ao padrão', () => {
+  assert.deepEqual(normalizeAppearance(null), DEFAULT_APPEARANCE);
+  const a = normalizeAppearance({ theme: 'roxo', accent: 'red', fontScale: 'extra', ribbons: false });
+  assert.equal(a.theme, 'escuro');
+  assert.equal(a.accent, DEFAULT_APPEARANCE.accent);
+  assert.equal(a.fontScale, 'extra');
+  assert.equal(a.ribbons, false);
+});

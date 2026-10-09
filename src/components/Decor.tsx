@@ -59,25 +59,25 @@ export function Orb({ size = 280 }: { size?: number }) {
     <svg className="orb" width={size} height={size} viewBox="0 0 300 300" aria-hidden="true">
       <defs>
         <radialGradient id="orb-core" cx="40%" cy="35%" r="70%">
-          <stop offset="0" stopColor="#cfe0ff" />
-          <stop offset="0.35" stopColor="#5d8dff" />
-          <stop offset="1" stopColor="#0f1e52" />
+          <stop offset="0" style={{ stopColor: 'var(--ice-2)' }} />
+          <stop offset="0.35" style={{ stopColor: 'var(--electric-soft)' }} />
+          <stop offset="1" style={{ stopColor: 'var(--electric-strong)' }} />
         </radialGradient>
       </defs>
       <g className="orb-ring r1">
-        <ellipse cx="150" cy="150" rx="136" ry="52" fill="none" stroke="rgba(156,195,255,.35)" strokeWidth="1.2" />
-        <circle cx="286" cy="150" r="6" fill="#9cc3ff" />
+        <ellipse cx="150" cy="150" rx="136" ry="52" fill="none" style={{ stroke: 'rgb(var(--tint-rgb) / .35)' }} strokeWidth="1.2" />
+        <circle cx="286" cy="150" r="6" style={{ fill: 'var(--sky)' }} />
       </g>
       <g className="orb-ring r2">
-        <ellipse cx="150" cy="150" rx="118" ry="44" fill="none" stroke="rgba(47,107,255,.6)" strokeWidth="1.5" transform="rotate(60 150 150)" />
-        <circle cx="209" cy="252" r="5" fill="#2f6bff" />
+        <ellipse cx="150" cy="150" rx="118" ry="44" fill="none" style={{ stroke: 'rgb(var(--accent-rgb) / .6)' }} strokeWidth="1.5" transform="rotate(60 150 150)" />
+        <circle cx="209" cy="252" r="5" style={{ fill: 'var(--electric)' }} />
       </g>
       <g className="orb-ring r3">
-        <ellipse cx="150" cy="150" rx="118" ry="44" fill="none" stroke="rgba(238,243,255,.25)" strokeWidth="1" transform="rotate(-60 150 150)" />
+        <ellipse cx="150" cy="150" rx="118" ry="44" fill="none" style={{ stroke: 'rgb(var(--tint-rgb) / .25)' }} strokeWidth="1" transform="rotate(-60 150 150)" />
       </g>
       <circle cx="150" cy="150" r="66" fill="url(#orb-core)" />
       <circle cx="150" cy="150" r="66" fill="none" stroke="rgba(238,243,255,.4)" strokeWidth="1" />
-      <path d="M128 136h44M128 150h44M128 164h28" stroke="#fff" strokeWidth="5" strokeLinecap="round" opacity=".9" />
+      <path d="M128 136h44M128 150h44M128 164h28" style={{ stroke: 'var(--on-accent)' }} strokeWidth="5" strokeLinecap="round" opacity=".9" />
     </svg>
   );
 }

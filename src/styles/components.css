@@ -34,7 +34,7 @@
 }
 .btn-primary {
   --bg: var(--electric);
-  --fg: #fff;
+  --fg: var(--on-accent);
   --bd: transparent;
 }
 .btn-primary:hover:not(:disabled) {
@@ -72,7 +72,7 @@
 }
 .ice-zone .btn-primary,
 .panel-ice .btn-primary {
-  --fg: #fff;
+  --fg: var(--on-accent);
   --bd: transparent;
 }
 .ice-zone .btn:hover:not(:disabled),
@@ -102,7 +102,7 @@
   padding: 10px 14px;
   border-radius: 12px;
   border: 1px solid var(--line-strong);
-  background: rgba(4, 9, 32, 0.55);
+  background: rgb(var(--bg-rgb) / 0.55);
   color: var(--text);
   transition: border-color 0.2s, box-shadow 0.2s;
 }
@@ -114,7 +114,7 @@
 .select {
   appearance: none;
   padding-right: 38px;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none' stroke='%239cc3ff' stroke-width='2'%3E%3Cpath d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+  background-image: var(--select-arrow);
   background-repeat: no-repeat;
   background-position: right 14px center;
 }
@@ -125,8 +125,8 @@
 .select:focus,
 .textarea:focus {
   outline: none;
-  border-color: var(--electric-soft);
-  box-shadow: 0 0 0 3px rgba(47, 107, 255, 0.28);
+  border-color: var(--accent-text);
+  box-shadow: 0 0 0 3px rgb(var(--accent-rgb) / 0.28);
 }
 .input::placeholder,
 .textarea::placeholder {
@@ -168,7 +168,7 @@
   position: relative;
   border-radius: var(--r-lg);
   border: 1px solid var(--line);
-  background: linear-gradient(180deg, rgba(15, 30, 82, 0.6), rgba(10, 22, 64, 0.35));
+  background: linear-gradient(180deg, rgb(var(--surface-rgb) / 0.6), rgb(var(--surface-rgb) / 0.35));
   padding: clamp(18px, 3vw, 28px);
 }
 .panel-ice {
@@ -180,11 +180,11 @@
 .panel-electric {
   border-radius: var(--r-lg);
   background: var(--electric);
-  color: #fff;
+  color: var(--on-accent);
   padding: clamp(18px, 3vw, 28px);
 }
 .glass {
-  background: rgba(238, 243, 255, 0.06);
+  background: rgb(var(--tint-rgb) / 0.06);
   border: 1px solid var(--line);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
@@ -234,14 +234,14 @@
   border-radius: var(--r-pill);
   font-size: 0.74rem;
   font-weight: 700;
-  background: rgba(156, 195, 255, 0.12);
+  background: rgb(var(--tint-rgb) / 0.12);
   color: var(--text-2);
   white-space: nowrap;
 }
 .panel-ice .chip,
 .ice-zone .chip {
-  background: rgba(47, 107, 255, 0.1);
-  color: var(--electric-strong);
+  background: rgb(var(--accent-rgb) / 0.1);
+  color: var(--accent-on-light);
 }
 .chip.good {
   background: rgba(52, 211, 153, 0.14);
@@ -287,7 +287,7 @@
 .filter-btn[aria-checked='true'] {
   background: var(--electric);
   border-color: var(--electric);
-  color: #fff;
+  color: var(--on-accent);
 }
 
 /* ── Listas ────────────────────────────────────────────────────────── */
@@ -356,7 +356,7 @@
   content: '';
   width: 6px;
   height: 11px;
-  border: solid #fff;
+  border: solid var(--on-accent);
   border-width: 0 2px 2px 0;
   transform: rotate(45deg) translate(-1px, -1px);
 }
@@ -394,7 +394,7 @@
 .meter {
   height: 8px;
   border-radius: var(--r-pill);
-  background: rgba(156, 195, 255, 0.14);
+  background: rgb(var(--tint-rgb) / 0.14);
   overflow: hidden;
 }
 .meter > i {
@@ -450,8 +450,8 @@
   background: rgba(251, 113, 133, 0.08);
 }
 .alert.info {
-  border-color: rgba(93, 141, 255, 0.4);
-  background: rgba(47, 107, 255, 0.1);
+  border-color: rgb(var(--accent-rgb) / 0.4);
+  background: rgb(var(--accent-rgb) / 0.1);
 }
 .alert-body {
   display: grid;
@@ -480,7 +480,7 @@
 }
 .skeleton {
   border-radius: 10px;
-  background: linear-gradient(90deg, rgba(156, 195, 255, 0.08), rgba(156, 195, 255, 0.18), rgba(156, 195, 255, 0.08)) 0 0 / 200% 100%;
+  background: linear-gradient(90deg, rgb(var(--tint-rgb) / 0.08), rgb(var(--tint-rgb) / 0.18), rgb(var(--tint-rgb) / 0.08)) 0 0 / 200% 100%;
   animation: shimmer 1.4s linear infinite;
 }
 @keyframes shimmer {
@@ -570,7 +570,7 @@
   place-items: center;
   flex: none;
   background: var(--electric);
-  color: #fff;
+  color: var(--on-accent);
 }
 .toast.error .toast-icon {
   background: #e11d48;
@@ -606,7 +606,7 @@
 .md code {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 0.88em;
-  background: rgba(156, 195, 255, 0.14);
+  background: rgb(var(--tint-rgb) / 0.14);
   padding: 1px 6px;
   border-radius: 6px;
 }
@@ -614,7 +614,7 @@
   margin: 0;
   padding: 12px 14px;
   border-radius: 12px;
-  background: rgba(4, 9, 32, 0.7);
+  background: rgb(var(--bg-rgb) / 0.7);
   overflow-x: auto;
 }
 .md pre code {

@@ -420,7 +420,7 @@ function Result({ attempt, onNew, onCards, onRetry }: { attempt: QuizAttempt; on
     <section className="quiz-result" aria-label="Resultado do quiz">
       <div className="result-hero panel-electric">
         <div>
-          <p className="stat-label" style={{ color: 'rgba(255,255,255,.75)' }}>
+          <p className="stat-label" style={{ color: 'inherit', opacity: 0.8 }}>
             Resultado · {attempt.subject}
           </p>
           <p className="result-score">
@@ -437,13 +437,13 @@ function Result({ attempt, onNew, onCards, onRetry }: { attempt: QuizAttempt; on
           </button>
           {wrong > 0 && (
             <>
-              <button type="button" className="btn" style={{ '--fg': '#fff', '--bd': 'rgba(255,255,255,.5)' } as React.CSSProperties} onClick={onRetry}>
+              <button type="button" className="btn" style={{ '--fg': 'var(--on-accent)', '--bd': 'color-mix(in srgb, var(--on-accent) 50%, transparent)' } as React.CSSProperties} onClick={onRetry}>
                 Refazer erros
               </button>
               <button
                 type="button"
                 className="btn"
-                style={{ '--fg': '#fff', '--bd': 'rgba(255,255,255,.5)' } as React.CSSProperties}
+                style={{ '--fg': 'var(--on-accent)', '--bd': 'color-mix(in srgb, var(--on-accent) 50%, transparent)' } as React.CSSProperties}
                 disabled={cardsDone}
                 onClick={() => {
                   onCards();

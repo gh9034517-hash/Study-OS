@@ -1,5 +1,6 @@
 import { useSyncExternalStore } from 'react';
 import type { AppData, Profile } from './types';
+import { DEFAULT_APPEARANCE, normalizeAppearance } from './appearance';
 
 const STORAGE_KEY = 'studyos:data:v1';
 const BACKUP_KEY = 'studyos:data:v1:backup';
@@ -23,6 +24,7 @@ export function emptyData(): AppData {
     cards: [],
     reviews: [],
     chats: [],
+    appearance: { ...DEFAULT_APPEARANCE },
   };
 }
 
@@ -57,6 +59,7 @@ export function normalizeData(raw: unknown): AppData {
     reviews: arr(raw.reviews, (x) => str(x.id) && str(x.cardId) && num(x.grade)),
     chats: arr(raw.chats, (x) => str(x.id) && Array.isArray(x.messages)),
     insights: isObj(raw.insights) && str(raw.insights.text) ? (raw.insights as AppData['insights']) : undefined,
+    appearance: normalizeAppearance(raw.appearance),
   };
 }
 

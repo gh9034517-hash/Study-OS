@@ -1,4 +1,5 @@
 import type { ChatMessage, Level, TutorMode } from '../../shared/api';
+import type { Appearance } from './appearance';
 
 export type { Level, TutorMode, ChatMessage };
 
@@ -126,4 +127,5 @@ export interface AppData {
   reviews: ReviewLog[];
   chats: ChatThread[];
   insights?: { text: string; date: string; model: string };
+  appearance: Appearance;
 }
