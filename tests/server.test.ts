@@ -139,3 +139,70 @@ test('parseJsonLoose extrai JSON com texto em volta', () => {
   assert.deepEqual(parseJsonLoose('Aqui está: {"a":1} fim'), { a: 1 });
   assert.throws(() => parseJsonLoose('sem json'));
 });
+
+test('modelo sobrecarregado (503) cai para o modelo de reserva', async () => {
+  const models: string[] = [];
+  globalThis.fetch = (async (url: string) => {
+    const model = /models\/([^:]+):/.exec(url)![1];
+    models.push(model);
+    if (model === 'gemini-flash-lite-latest') {
+      return new Response(JSON.stringify({ error: { message: 'This model is currently experiencing high demand.' } }), { status: 503 });
+    }
+    return geminiReply('resposta da reserva')();
+  }) as typeof fetch;
+  const res = await handle('chat', 'POST', chatBody, 'ip');
+  assert.equal(res.status, 200);
+  assert.equal((res.body as any).reply, 'resposta da reserva');
+  assert.deepEqual(models, ['gemini-flash-lite-latest', 'gemini-flash-latest']);
+});
+
+test('modelo sem suporte ao nível de raciocínio repete sem a configuração', async () => {
+  const bodies: any[] = [];
+  globalThis.fetch = (async (_url: string, init: RequestInit) => {
+    const body = JSON.parse(String(init.body));
+    bodies.push(body);
+    if (body.generationConfig.thinkingConfig) {
+      return new Response(JSON.stringify({ error: { message: 'Thinking level LOW is not supported for this model.' } }), { status: 400 });
+    }
+    return geminiReply('ok sem thinking')();
+  }) as typeof fetch;
+  const res = await handle('chat', 'POST', chatBody, 'ip');
+  assert.equal(res.status, 200);
+  assert.equal(bodies.length, 2);
+  assert.equal(bodies[1].generationConfig.thinkingConfig, undefined);
+});
+
+test('chave inválida não tenta reserva', async () => {
+  let calls = 0;
+  globalThis.fetch = (async () => {
+    calls++;
+    return new Response(JSON.stringify({ error: { message: 'API key not valid.' } }), { status: 400 });
+  }) as typeof fetch;
+  const res = await handle('chat', 'POST', chatBody, 'ip');
+  assert.equal((res.body as any).error.code, 'invalid_key');
+  assert.equal(calls, 1);
+});
+
+test('JSON com barra invertida solta e quebra de linha crua é corrigido', () => {
+  const raw = '{"questions":[{"question":"Calcule \\sqrt{16} e \\( x \\)","explanation":"linha 1\nlinha 2"}]}';
+  const d = parseJsonLoose(raw) as any;
+  assert.match(d.questions[0].question, /\\sqrt\{16\}/);
+  assert.equal(d.questions[0].explanation, 'linha 1\nlinha 2');
+});
+
+test('quiz com JSON quebrado na primeira resposta é gerado novamente', async () => {
+  let n = 0;
+  const good = JSON.stringify({ questions: [{ question: 'Quanto é 1+1?', options: ['1', '2', '3', '4'], answer: 1, explanation: '1+1=2', topic: 'Soma' }] });
+  globalThis.fetch = (async () => (n++ === 0 ? geminiReply('{"questions":[{"question":"cortad')() : geminiReply(good)())) as typeof fetch;
+  const res = await handle('quiz', 'POST', { subject: 'Matemática', level: 'iniciante', count: 3 }, 'ip');
+  assert.equal(res.status, 200);
+  assert.equal((res.body as any).questions.length, 1);
+  assert.equal(n, 2);
+});
+
+test('flashcards em lista solta (sem objeto envolvente) são aceitos', async () => {
+  globalThis.fetch = geminiReply(JSON.stringify([{ front: 'O que é DNA?', back: 'Molécula da hereditariedade.', topic: 'Genética' }])) as typeof fetch;
+  const res = await handle('flashcards', 'POST', { subject: 'Biologia', level: 'iniciante', count: 3 }, 'ip');
+  assert.equal(res.status, 200);
+  assert.equal((res.body as any).cards[0].front, 'O que é DNA?');
+});

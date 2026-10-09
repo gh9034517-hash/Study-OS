@@ -46,7 +46,8 @@ cp .env.example .env
 | `AI_PROVIDER` | `gemini` | `gemini` ou `groq` |
 | `GEMINI_API_KEY` | — | Chave do Google AI Studio |
 | `GROQ_API_KEY` | — | (Opcional) chave gratuita da GroqCloud, se `AI_PROVIDER=groq` |
-| `AI_MODEL` | `gemini-flash-latest` / `llama-3.3-70b-versatile` | Modelo usado |
+| `AI_MODEL` | `gemini-flash-lite-latest` / `llama-3.3-70b-versatile` | Modelo principal |
+| `AI_FALLBACK_MODELS` | `gemini-flash-latest` / `llama-3.1-8b-instant` | Reservas usadas automaticamente quando o principal está sobrecarregado, lento ou sem cota |
 | `RATE_LIMIT_PER_MINUTE` | `12` | Requisições de IA por minuto por IP |
 | `RATE_LIMIT_PER_DAY` | `200` | Requisições de IA por dia por IP |
 | `PORT` | `8787` | Porta do servidor |
@@ -96,7 +97,8 @@ Sem chave configurada o app funciona normalmente em modo offline (quiz com banco
 ## 6. Limites da IA gratuita
 
 - A camada gratuita do Gemini tem limites de **requisições por minuto e por dia** por projeto, que o Google pode alterar. Consulte os valores atuais em <https://ai.google.dev/gemini-api/docs/rate-limits> e no painel do AI Studio.
-- Ao atingir a cota, a API responde 429; o StudyOS mostra "cota gratuita atingida" e oferece o modo offline.
+- Na camada gratuita o Google às vezes recusa por "alta demanda" (erro 503). O StudyOS tenta automaticamente o modelo de reserva antes de mostrar erro.
+- Ao atingir a cota, a API responde 429; o StudyOS tenta a reserva e, se também estiver sem cota, mostra "cota gratuita atingida" e oferece o modo offline.
 - Pelos termos da camada gratuita, o Google pode usar os dados enviados para melhorar seus produtos. Não envie dados pessoais ao tutor.
 - O modelo pode errar: o app avisa isso no tutor e na análise do diagnóstico.
 

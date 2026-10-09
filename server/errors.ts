@@ -6,6 +6,8 @@ export class ApiError extends Error {
     public readonly code: ApiErrorCode,
     message: string,
     public readonly retryAfterSeconds?: number,
+    /** Falha passageira do provedor: vale tentar outro modelo. */
+    public readonly retryable = false,
   ) {
     super(message);
   }

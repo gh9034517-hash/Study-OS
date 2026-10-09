@@ -65,42 +65,108 @@ const insightsSchema = z.object({
 });
 
 // ── Validação da saída da IA ─────────────────────────────────────────────
-const aiQuizSchema = z.object({
-  questions: z
-    .array(
-      z.object({
-        question: text(1200),
-        options: z.array(z.string().trim().min(1).max(400)).length(4),
-        answer: z.coerce.number().int().min(0).max(3),
-        explanation: text(2000),
-        topic: z.string().trim().max(80).optional().default('Geral'),
-      }),
-    )
-    .min(1),
-});
+/** Aceita a lista "solta" (sem o objeto envolvente), formato que alguns modelos devolvem. */
+const wrapList = (key: string) => (v: unknown) => (Array.isArray(v) ? { [key]: v } : v);
 
-const aiCardsSchema = z.object({
-  cards: z
-    .array(z.object({ front: text(400), back: text(800), topic: z.string().trim().max(80).optional().default('Geral') }))
-    .min(1),
-});
+const aiQuizSchema = z.preprocess(
+  wrapList('questions'),
+  z.object({
+    questions: z
+      .array(
+        z.object({
+          question: text(3000),
+          options: z.array(z.string().trim().min(1).max(600)).length(4),
+          answer: z.coerce.number().int().min(0).max(3),
+          explanation: text(5000),
+          topic: z.string().trim().max(80).optional().default('Geral'),
+        }),
+      )
+      .min(1),
+  }),
+);
+
+const aiCardsSchema = z.preprocess(
+  wrapList('cards'),
+  z.object({
+    cards: z
+      .array(z.object({ front: text(600), back: text(1200), topic: z.string().trim().max(80).optional().default('Geral') }))
+      .min(1),
+  }),
+);
 
 export function parseJsonLoose(raw: string): unknown {
   const cleaned = raw.replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/, '').trim();
-  try {
-    return JSON.parse(cleaned);
-  } catch {
-    const start = cleaned.indexOf('{');
-    const end = cleaned.lastIndexOf('}');
-    if (start >= 0 && end > start) {
+  const start = cleaned.indexOf('{');
+  const end = cleaned.lastIndexOf('}');
+  const candidates = [cleaned, start >= 0 && end > start ? cleaned.slice(start, end + 1) : ''];
+  for (const text of candidates.filter(Boolean)) {
+    for (const attempt of [text, fixEscapes(text)]) {
       try {
-        return JSON.parse(cleaned.slice(start, end + 1));
+        return JSON.parse(attempt);
       } catch {
-        /* cai no erro abaixo */
+        /* tenta a próxima forma */
       }
     }
-    throw new ApiError(502, 'bad_output', 'A IA respondeu em um formato inesperado. Tente gerar novamente.');
   }
+  throw new ApiError(502, 'bad_output', 'A IA respondeu em um formato inesperado. Tente gerar novamente.');
+}
+
+/** Corrige barras invertidas soltas (ex.: fórmulas como \frac) e quebras de linha cruas dentro de strings. */
+function fixEscapes(text: string): string {
+  let out = '';
+  let inString = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (inString) {
+      if (c === '\\') {
+        const next = text[i + 1] ?? '';
+        if (/["\\/bfnrt]/.test(next) || (next === 'u' && /^[0-9a-f]{4}$/i.test(text.slice(i + 2, i + 6)))) {
+          out += c + next;
+          i++;
+        } else {
+          out += '\\\\';
+        }
+        continue;
+      }
+      if (c === '"') inString = false;
+      if (c === '\n') {
+        out += '\\n';
+        continue;
+      }
+      if (c === '\r' || c === '\t') {
+        out += ' ';
+        continue;
+      }
+    } else if (c === '"') {
+      inString = true;
+    }
+    out += c;
+  }
+  return out;
+}
+
+/** Gera JSON com a IA, valida com o esquema e tenta mais uma vez se a resposta vier com defeito. */
+async function generateValidated<T>(
+  config: ReturnType<typeof getConfig>,
+  input: Parameters<typeof generate>[1],
+  schema: z.ZodType<T>,
+  invalidMessage: string,
+): Promise<{ data: T; model: string }> {
+  let lastError: ApiError | undefined;
+  for (let i = 0; i < 2; i++) {
+    if (i > 0 && input.deadline && input.deadline - Date.now() < 5000) break;
+    const out = await generate(config, input);
+    try {
+      const parsed = schema.safeParse(parseJsonLoose(out.text));
+      if (parsed.success) return { data: parsed.data, model: out.model };
+      lastError = new ApiError(502, 'bad_output', invalidMessage);
+    } catch (err) {
+      if (!(err instanceof ApiError)) throw err;
+      lastError = err;
+    }
+    console.warn(`[StudyOS] resposta da IA descartada (${out.model}, ${out.text.length} caracteres); gerando novamente.`);
+  }
+  throw lastError!;
 }
 
 function validate<T>(schema: z.ZodType<T>, body: unknown): T {
@@ -151,6 +217,8 @@ export async function handle(route: string, method: string, body: unknown, clien
             : validate(insightsSchema, body);
 
     checkRateLimit(clientKey, config.perMinute, config.perDay);
+    // Margem abaixo do limite de 60 s das funções serverless.
+    const deadline = Date.now() + 50_000;
 
     switch (route) {
       case 'chat': {
@@ -159,21 +227,26 @@ export async function handle(route: string, method: string, body: unknown, clien
           system: tutorSystemPrompt(input.level, input.mode, input.subject, input.topic),
           messages: input.messages,
           temperature: 0.6,
+          deadline,
         });
         return ok<ChatResponse>({ reply: out.text, model: out.model });
       }
       case 'quiz': {
         const input = parsed as z.infer<typeof quizSchema>;
-        const out = await generate(config, {
-          system: 'Você é um elaborador de avaliações educacionais rigoroso. Responda apenas com JSON.',
-          messages: [{ role: 'user', content: quizPrompt(input.subject, input.topic, input.level, input.count) }],
-          json: true,
-          temperature: 0.8,
-          maxTokens: 4096,
-        });
-        const data = aiQuizSchema.safeParse(parseJsonLoose(out.text));
-        if (!data.success) throw new ApiError(502, 'bad_output', 'A IA gerou questões incompletas. Tente novamente.');
-        const questions: QuizQuestion[] = data.data.questions.slice(0, input.count).map((q) => ({
+        const out = await generateValidated(
+          config,
+          {
+            system: 'Você é um elaborador de avaliações educacionais rigoroso. Responda apenas com JSON.',
+            messages: [{ role: 'user', content: quizPrompt(input.subject, input.topic, input.level, input.count) }],
+            json: true,
+            temperature: 0.8,
+            maxTokens: 6144,
+            deadline,
+          },
+          aiQuizSchema,
+          'A IA gerou questões incompletas. Tente novamente.',
+        );
+        const questions: QuizQuestion[] = out.data.questions.slice(0, input.count).map((q) => ({
           ...q,
           topic: q.topic || input.topic || 'Geral',
         }));
@@ -181,16 +254,20 @@ export async function handle(route: string, method: string, body: unknown, clien
       }
       case 'flashcards': {
         const input = parsed as z.infer<typeof flashcardsSchema>;
-        const out = await generate(config, {
-          system: 'Você cria flashcards objetivos para repetição espaçada. Responda apenas com JSON.',
-          messages: [{ role: 'user', content: flashcardsPrompt(input.subject, input.topic, input.level, input.count) }],
-          json: true,
-          temperature: 0.6,
-          maxTokens: 3072,
-        });
-        const data = aiCardsSchema.safeParse(parseJsonLoose(out.text));
-        if (!data.success) throw new ApiError(502, 'bad_output', 'A IA gerou flashcards incompletos. Tente novamente.');
-        return ok<FlashcardsResponse>({ cards: data.data.cards.slice(0, input.count), model: out.model });
+        const out = await generateValidated(
+          config,
+          {
+            system: 'Você cria flashcards objetivos para repetição espaçada. Responda apenas com JSON.',
+            messages: [{ role: 'user', content: flashcardsPrompt(input.subject, input.topic, input.level, input.count) }],
+            json: true,
+            temperature: 0.6,
+            maxTokens: 4096,
+            deadline,
+          },
+          aiCardsSchema,
+          'A IA gerou flashcards incompletos. Tente novamente.',
+        );
+        return ok<FlashcardsResponse>({ cards: out.data.cards.slice(0, input.count), model: out.model });
       }
       default: {
         const input = parsed as z.infer<typeof insightsSchema>;
@@ -198,6 +275,7 @@ export async function handle(route: string, method: string, body: unknown, clien
           system: insightsPrompt(input.level),
           messages: [{ role: 'user', content: JSON.stringify(input) }],
           temperature: 0.4,
+          deadline,
         });
         return ok<InsightsResponse>({ analysis: out.text, model: out.model });
       }
