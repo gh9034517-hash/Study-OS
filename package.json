@@ -1,0 +1,37 @@
+{
+  "name": "study-os",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "StudyOS — plataforma inteligente de estudos com tutor de IA, quiz, plano, revisão espaçada e diagnóstico.",
+  "engines": {
+    "node": ">=20.19.0"
+  },
+  "scripts": {
+    "dev": "concurrently -k -n api,web -c blue,cyan \"npm:dev:api\" \"npm:dev:web\"",
+    "dev:web": "vite",
+    "dev:api": "tsx watch server/index.ts",
+    "typecheck": "tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.server.json --noEmit",
+    "build": "npm run typecheck && vite build && tsc -p tsconfig.server.json",
+    "start": "node build/server/index.js",
+    "preview": "npm run build && npm start",
+    "test": "tsx --test tests/*.test.ts"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "zod": "^4.3.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@vitejs/plugin-react": "^6.0.0",
+    "concurrently": "^9.2.0",
+    "tsx": "^4.20.0",
+    "typescript": "~5.9.3",
+    "vite": "^8.0.0"
+  }
+}

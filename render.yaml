@@ -1,0 +1,20 @@
+# Blueprint do Render (plano gratuito): um único serviço Node que serve o frontend e a API.
+services:
+  - type: web
+    name: studyos
+    runtime: node
+    plan: free
+    buildCommand: npm ci --include=dev && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: 22
+      - key: AI_PROVIDER
+        value: gemini
+      - key: GEMINI_API_KEY
+        sync: false # preencha no painel do Render; nunca no repositório
+      - key: RATE_LIMIT_PER_MINUTE
+        value: 12
+      - key: RATE_LIMIT_PER_DAY
+        value: 200
